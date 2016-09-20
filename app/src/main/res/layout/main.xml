@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/main">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity"
+                android:id="@+id/notification_title"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_notification_switch"
+                android:layout_below="@+id/notification_title" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_notification_switch_explanation"
+                android:id="@+id/switch_notification_explanation"
+                android:layout_below="@+id/switch_notification"
+                android:layout_marginRight="80dp"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/switch_notification_explanation"
+                android:text="@string/lock_screen_activity_floating_button_title"
+                android:id="@+id/float_button_title"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginTop="30dp" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_float_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_switch_floating_button"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/float_button_title"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_switch_floating_button_explanation"
+                android:id="@+id/switch_float_button_explanation"
+                android:layout_below="@+id/switch_float_button"
+                android:layout_marginRight="80dp"
+                android:textSize="13sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:id="@+id/separator1"
+                android:layout_marginTop="15dp"
+                android:background="@color/colorSeparator"
+                android:layout_below="@+id/switch_float_button_explanation" />
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/switch_fullscreen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/lock_screen_activity_switch_auto_hide_in_full_screen"
+                android:layout_below="@+id/separator1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_switch_auto_hide_in_full_screen_explanation"
+                android:id="@+id/switch_fullscreen_explanation"
+                android:layout_below="@+id/switch_fullscreen"
+                android:layout_marginRight="80dp"
+                android:textSize="13sp" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_container"
+                android:background="?attr/selectableItemBackground"
+                android:layout_below="@+id/switch_fullscreen_explanation"
+                android:layout_marginTop="15dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:id="@+id/separator2"
+                    android:background="@color/colorSeparator" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button_apps_list"
+                    android:textColor="@drawable/color_state_list"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/lock_screen_activity_switch_auto_hide"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/separator2"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lock_screen_activity_switch_auto_hide_explanation"
+                    android:id="@+id/button_apps_list_explanation"
+                    android:layout_below="@+id/button_apps_list"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="80dp"
+                    android:textSize="13sp" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/arrow"
+                    android:src="@drawable/abc_ic_go_search_api_material"
+                    android:layout_alignRight="@+id/button_apps_list"
+                    android:layout_alignTop="@+id/button_apps_list"
+                    android:layout_alignBottom="@+id/button_apps_list_explanation" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:id="@+id/separator3"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/colorSeparator"
+                    android:layout_below="@+id/button_apps_list_explanation" />
+
+            </RelativeLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lock_screen_activity_optimal_size"
+                android:textColor="@android:color/black"
+                android:id="@+id/seek_bar_explanation"
+                android:layout_below="@+id/button_container"
+                android:layout_marginTop="15dp" />
+
+            <SeekBar
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scale"
+                android:layout_below="@+id/seek_bar_explanation"
+                android:layout_marginTop="15dp"
+                android:layout_centerHorizontal="true"
+                android:max="200"
+                android:progress="50" />
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:id="@+id/imageView"
+                android:src="@drawable/ic_float_button"
+                android:layout_below="@+id/scale"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="15dp"/>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</LinearLayout>

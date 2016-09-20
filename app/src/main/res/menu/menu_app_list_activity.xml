@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/ic_apply"
+        android:title="@string/menu_apply"
+        android:icon="@mipmap/ic_check"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/ic_check_all"
+        android:title="@string/menu_check_all"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/ic_uncheck_all"
+        android:title="@string/menu_uncheck_all"
+        app:showAsAction="never"/>
+
+</menu>

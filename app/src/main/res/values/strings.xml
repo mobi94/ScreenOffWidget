@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Screen Off Widget</string>
+    <string name="app_settings">Settings</string>
+
+    <string name="accessibility_service_description">Switch on to auto-hide floating button on top of the selected applications</string>
+    <string name="accessibility_service_name">Screen Off Widget</string>
+
+    <string name="progress_dialog">Please, wait…</string>
+
+    <string name="apps_list_title">Hide in fullscreen</string>
+    <string name="apps_list_activity_subtitle_2nd_part_singular"> app checked</string>
+    <string name="apps_list_activity_subtitle_2nd_part_plural"> apps checked</string>
+    <string name="apps_list_activity_subtitle_1st_part">No checked apps</string>
+    <string name="apps_list_activity_list_item_title_unknown">Unknown</string>
+
+    <string name="lock_screen_activity_notification_title">Press here to turn off the screen</string>
+    <string name="lock_screen_activity">Notification</string>
+    <string name="lock_screen_activity_notification_switch">Enable notification</string>
+    <string name="lock_screen_activity_notification_switch_explanation">Shows notification in status bar</string>
+    <string name="lock_screen_activity_floating_button_title">Floating button</string>
+    <string name="lock_screen_activity_switch_floating_button">Enable floating button</string>
+    <string name="lock_screen_activity_switch_floating_button_explanation">Creates floating button on top of all applications</string>
+    <string name="lock_screen_activity_switch_auto_hide_in_full_screen">Auto hide in full screen</string>
+    <string name="lock_screen_activity_switch_auto_hide_in_full_screen_explanation">Automatically hides floating button in full screen mode</string>
+    <string name="lock_screen_activity_switch_auto_hide">Select applications to auto-hide</string>
+    <string name="lock_screen_activity_switch_auto_hide_explanation">For the first time you must activate the service with name \'Screen Off Widget\'</string>
+    <string name="lock_screen_activity_optimal_size">Choose the optimal size</string>
+
+    <string name="admin_description">Uncheck the box before the application removing</string>
+    <string name="admin_permission_explanation">This makes it possible to turn off the screen by pressing the widget button.</string>
+    <string name="admin_permission_enabled">Admin permissions enabled</string>
+    <string name="admin_permission_disabled">Admin permissions disabled</string>
+    <string name="admin_permission_disable_request">You are going to disable admin rights for this application. Are you sure you want to continue?</string>
+
+    <string name="menu_apply">Apply</string>
+    <string name="menu_check_all">Check all</string>
+    <string name="menu_uncheck_all">Uncheck all</string>
+
+</resources>

@@ -1,0 +1,40 @@
+<resources>
+
+    <string name="app_name">Screen Off Widget</string>
+    <string name="app_settings">Настройки </string>
+
+    <string name="accessibility_service_description">Включите для автоматического скрытия плавающей кнопки поверх выбранных приложений</string>
+    <string name="accessibility_service_name">Screen Off Widget</string>
+
+    <string name="progress_dialog">Пожалуйста, подождите…</string>
+
+    <string name="apps_list_title">Скрыть кнопку</string>
+    <string name="apps_list_activity_subtitle_2nd_part_singular"> выбрано</string>
+    <string name="apps_list_activity_subtitle_2nd_part_plural"> выбрано</string>
+    <string name="apps_list_activity_subtitle_1st_part">Ничего не выбрано</string>
+    <string name="apps_list_activity_list_item_title_unknown">Неизвестно</string>
+
+    <string name="lock_screen_activity_notification_title">Нажмите здесь, чтобы выключить экран</string>
+    <string name="lock_screen_activity">Уведомление</string>
+    <string name="lock_screen_activity_notification_switch">Включить уведомление</string>
+    <string name="lock_screen_activity_notification_switch_explanation">Показывает уведомление в строке состояния</string>
+    <string name="lock_screen_activity_floating_button_title">Плавающая кнопка</string>
+    <string name="lock_screen_activity_switch_floating_button">Включить плавающую кнопку</string>
+    <string name="lock_screen_activity_switch_floating_button_explanation">Создает плавающую кнопку поверх всех приложений</string>
+    <string name="lock_screen_activity_switch_auto_hide_in_full_screen">Скрыть в полноэкранном режиме</string>
+    <string name="lock_screen_activity_switch_auto_hide_in_full_screen_explanation">Автоматически скрывает плавающую кнопку в полноэкранном режиме</string>
+    <string name="lock_screen_activity_switch_auto_hide">Скрыть кнопку в приложениях</string>
+    <string name="lock_screen_activity_switch_auto_hide_explanation">Для первого использования необходимо активировать службу с именем \'Screen Off Widget\'</string>
+    <string name="lock_screen_activity_optimal_size">Выберите оптимальный размер</string>
+
+    <string name="admin_description">Снимите флажок перед удалением приложения</string>
+    <string name="admin_permission_explanation">Это позволит выключить экран, нажав на кнопку виджета.</string>
+    <string name="admin_permission_enabled">Разрешение администратора включено</string>
+    <string name="admin_permission_disabled">Разрешение администратора выключено</string>
+    <string name="admin_permission_disable_request">Вы собираетесь отключить права администратора для этого приложения. Вы уверены, что хотите продолжить?</string>
+
+    <string name="menu_apply">Применить</string>
+    <string name="menu_check_all">Выбрать все</string>
+    <string name="menu_uncheck_all">Отменить все</string>
+
+</resources>
