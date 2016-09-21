@@ -5,12 +5,16 @@ import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
@@ -24,17 +28,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class LockScreenActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener  {
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private SwitchCompat switchFloatButton;
     private SwitchCompat switchNotification;
     private SwitchCompat switchFullscreen;
     private RelativeLayout buttonToHideInApps;
     private ScrollView scrollView;
+    private LinearLayout adViewContainer;
 
     static final int RESULT_ENABLED_FOR_HIDE_IN_APPS = 1;
     static final int RESULT_ENABLED_FOR_FLOAT_BUTTON = 2;
@@ -67,6 +80,12 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
             actionBar.setLogo(R.mipmap.ic_launcher);
         }
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        adViewContainer = (LinearLayout) findViewById(R.id.adViewContainer);
+
+        registerNetworkBroadcastReceiver();
+        setUpAdMob();
+
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         scrollView = (ScrollView)findViewById(R.id.scrollView);
@@ -83,6 +102,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         buttonToHideInApps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setUpFirebase();
                 if (!isAccessibilitySettingsOn(getApplicationContext())) {
                     Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                     startActivityForResult(intent, RESULT_ENABLED_FOR_HIDE_IN_APPS);
@@ -92,8 +112,6 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         });
 
         getSavedSeekBarScale();
-
-        //updateMargins();
 
         checkAdminActive = new CheckAdminActive(this);
         activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
@@ -111,6 +129,54 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         switchNotification.setOnCheckedChangeListener(this);
         switchFullscreen.setOnCheckedChangeListener(this);
 
+    }
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ConnectivityManager.CONNECTIVITY_ACTION:
+                    if (NetworkUtil.getConnectivityStatus(context) == 0)
+                        adViewContainer.setVisibility(View.GONE);
+                    else
+                        adViewContainer.setVisibility(View.VISIBLE);
+                    break;
+            }
+        }
+    };
+
+    public void registerNetworkBroadcastReceiver(){
+        registerReceiver(networkStateReceiver, new IntentFilter(
+                ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    public void setUpAdMob(){
+        MobileAds.initialize(this, getResources().getString(R.string.banner_ad_unit_id));
+        final AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("923FD3F5F3D07BA8F35509FFCC5AC800")
+                .build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+            }
+        });
+    }
+
+    public void setUpFirebase(){
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "R.id.button_container");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "buttonToHideInApps");
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "layout");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener =

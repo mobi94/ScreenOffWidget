@@ -1,4 +1,7 @@
 <resources>
+
+    <string name="banner_ad_unit_id">ca-app-pub-4354348887035997/7550124269</string>
+
     <string name="app_name">Screen Off Widget</string>
     <string name="app_settings">Settings</string>
 
