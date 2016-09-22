@@ -1,7 +1,9 @@
 package com.android.screenoffwidget;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -19,7 +21,9 @@ public class NotificationService extends Service {
             switch (intent.getAction()) {
             case ACTION_NOTIFICATION_CLICKED:
                 if (checkAdminActive.isAdminActive()) checkAdminActive.lockTheScreen();
-                else startActivity(checkAdminActive.getIntentToEnableActiveAdmin().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                else context.startActivity(new Intent()
+                            .setComponent(new ComponentName("com.android.settings", "com.android.settings.DeviceAdminSettings"))
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 break;
             }
         }
@@ -35,6 +39,8 @@ public class NotificationService extends Service {
     @Override
     public void onDestroy() {
         unregisterReceiver(myReceiver);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(LockScreenActivity.MY_NOTIFICATION_ID);
         super.onDestroy();
     }
 

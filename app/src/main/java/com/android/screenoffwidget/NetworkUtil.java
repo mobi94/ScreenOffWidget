@@ -4,14 +4,14 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-public class NetworkUtil {
+class NetworkUtil {
 
-    public static int TYPE_WIFI = 1;
-    public static int TYPE_MOBILE = 2;
-    public static int TYPE_NOT_CONNECTED = 0;
+    private static int TYPE_WIFI = 1;
+    private static int TYPE_MOBILE = 2;
+    private static int TYPE_NOT_CONNECTED = 0;
 
 
-    public static int getConnectivityStatus(Context context) {
+    static int getConnectivityStatus(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 

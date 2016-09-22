@@ -50,25 +50,15 @@ public class MyWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent){
         super.onReceive(context, intent);
         checkAdminActive = new CheckAdminActive(context);
-
-        if (MyOnClick.equals(intent.getAction())){
+        switch (intent.getAction()){
+            case MyOnClick:
             if (!checkAdminActive.isAdminActive())
-                context.startActivity(checkAdminActive.getIntentToEnableActiveAdmin().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            else checkAdminActive.lockTheScreen();
-
-            /*Toast.makeText(context, "ky-ky", Toast.LENGTH_SHORT).show();
-
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
-            RemoteViews remoteViews;
-            ComponentName watchWidget;
-
-            remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-            watchWidget = new ComponentName(context, MyWidgetProvider.class);
-
-            remoteViews.setTextViewText(R.id.update, "TESTING");
-
-            appWidgetManager.updateAppWidget(watchWidget, remoteViews);*/
+                context.startActivity(new Intent()
+                        .setComponent(new ComponentName("com.android.settings", "com.android.settings.DeviceAdminSettings"))
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+            else
+                checkAdminActive.lockTheScreen();
+            break;
         }
     }
 

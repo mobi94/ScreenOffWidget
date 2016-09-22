@@ -14,7 +14,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
@@ -33,7 +32,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -47,12 +45,15 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
     private SwitchCompat switchFullscreen;
     private RelativeLayout buttonToHideInApps;
     private ScrollView scrollView;
-    private LinearLayout adViewContainer;
+
+    private AdView mAdView;
+    private AdRequest adRequest;
+    private boolean isAdShowed;
 
     static final int RESULT_ENABLED_FOR_HIDE_IN_APPS = 1;
     static final int RESULT_ENABLED_FOR_FLOAT_BUTTON = 2;
     static final int RESULT_ENABLED_FOR_NOTIFICATION = 3;
-    private static final int MY_NOTIFICATION_ID = 1234;
+    public static final int MY_NOTIFICATION_ID = 1234;
     public static final String ACTION_NOTIFICATION_CLICKED = "ACTION_NOTIFICATION_CLICKED";
 
     public static final String MyPREFERENCES = "LockScreenActivity";
@@ -67,6 +68,25 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
     public SeekBar seekBar;
     public final int defaultSeekBarProgress = 50;
 
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ConnectivityManager.CONNECTIVITY_ACTION:
+                    if (!isAdShowed)
+                        if (NetworkUtil.getConnectivityStatus(context) == 0) {
+                            mAdView.setVisibility(View.GONE);
+                        }
+                        else {
+                            isAdShowed = true;
+                            mAdView.setVisibility(View.VISIBLE);
+                            mAdView.loadAd(adRequest);
+                        }
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,17 +100,14 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
             actionBar.setLogo(R.mipmap.ic_launcher);
         }
 
+        isAdShowed = false;
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        adViewContainer = (LinearLayout) findViewById(R.id.adViewContainer);
-
-        registerNetworkBroadcastReceiver();
+        registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         setUpAdMob();
 
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         scrollView = (ScrollView)findViewById(R.id.scrollView);
-
-        //bottomView = (ImageView)findViewById(R.id.separator4);
         icon = (ImageView)findViewById(R.id.imageView);
         icon.setScaleType(ImageView.ScaleType.CENTER);
 
@@ -102,7 +119,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         buttonToHideInApps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setUpFirebase();
+                getFirebaseAnalytics();
                 if (!isAccessibilitySettingsOn(getApplicationContext())) {
                     Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
                     startActivityForResult(intent, RESULT_ENABLED_FOR_HIDE_IN_APPS);
@@ -112,6 +129,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         });
 
         getSavedSeekBarScale();
+        resizeIcon(seekBar.getProgress());
 
         checkAdminActive = new CheckAdminActive(this);
         activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
@@ -131,47 +149,16 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
 
     }
 
-    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case ConnectivityManager.CONNECTIVITY_ACTION:
-                    if (NetworkUtil.getConnectivityStatus(context) == 0)
-                        adViewContainer.setVisibility(View.GONE);
-                    else
-                        adViewContainer.setVisibility(View.VISIBLE);
-                    break;
-            }
-        }
-    };
-
-    public void registerNetworkBroadcastReceiver(){
-        registerReceiver(networkStateReceiver, new IntentFilter(
-                ConnectivityManager.CONNECTIVITY_ACTION));
-    }
-
     public void setUpAdMob(){
         MobileAds.initialize(this, getResources().getString(R.string.banner_ad_unit_id));
-        final AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder()
+        mAdView = (AdView) findViewById(R.id.adView);
+        adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .addTestDevice("923FD3F5F3D07BA8F35509FFCC5AC800")
                 .build();
-        mAdView.loadAd(adRequest);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-            }
-
-            @Override
-            public void onAdFailedToLoad(int i) {
-                super.onAdFailedToLoad(i);
-            }
-        });
     }
 
-    public void setUpFirebase(){
+    public void getFirebaseAnalytics(){
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "R.id.button_container");
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "buttonToHideInApps");
@@ -179,23 +166,27 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
+    public void resizeIcon(int progress){
+        float scale = getResources().getDisplayMetrics().density;
+        int size = (int) ((50 * scale + 0.5f) * (0.7f + (float)progress/100f));
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_float_button);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, size, size, false);
+        int iconWidth = resizedBitmap.getWidth();
+        int iconHeight = resizedBitmap.getHeight();
+        ViewGroup.LayoutParams layoutParams = icon.getLayoutParams();
+        layoutParams.width = iconWidth;
+        layoutParams.height = iconHeight;
+        icon.setLayoutParams(layoutParams);
+        icon.setImageBitmap(resizedBitmap);
+        scrollView.scrollTo(0, scrollView.getBottom());
+    }
+
     private SeekBar.OnSeekBarChangeListener seekBarChangeListener =
             new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress,
                                               boolean fromUser) {
-                    float scale = getResources().getDisplayMetrics().density;
-                    int size = (int) ((50 * scale + 0.5f) * (0.7f + (float)progress/100f));
-                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_float_button);
-                    Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, size, size, false);
-                    int iconWidth = resizedBitmap.getWidth();
-                    int iconHeight = resizedBitmap.getHeight();
-                    ViewGroup.LayoutParams layoutParams = icon.getLayoutParams();
-                    layoutParams.width = iconWidth;
-                    layoutParams.height = iconHeight;
-                    icon.setLayoutParams(layoutParams);
-                    icon.setImageBitmap(resizedBitmap);
-                    scrollView.scrollTo(0, scrollView.getBottom());
+                    resizeIcon(seekBar.getProgress());
 
                     //icon.setPivotX(icon.getWidth()/2);
                     //icon.setPivotY(0);
@@ -225,8 +216,8 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                     else startActivityForResult(checkAdminActive.getIntentToEnableActiveAdmin(), RESULT_ENABLED_FOR_NOTIFICATION);
                 }
                 else {
-                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                    notificationManager.cancel(MY_NOTIFICATION_ID);
+                    //NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    //notificationManager.cancel(MY_NOTIFICATION_ID);
                     stopService(new Intent(this, NotificationService.class));
                 }
                 break;
@@ -288,7 +279,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, intent, Intent.FILL_IN_ACTION);
         Resources r = getResources();
         Notification notification = new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.ic_menu_report_image)
+                .setSmallIcon(R.drawable.ic_stat_main)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
                 .setContentTitle(r.getString(R.string.app_name))
                 .setContentText(getResources().getString(R.string.lock_screen_activity_notification_title))
@@ -306,6 +297,12 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
     protected void onStop() {
         saveSeekBarScaleToSharedPrefs();
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkStateReceiver);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

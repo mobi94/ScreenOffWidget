@@ -6,26 +6,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 
-public class CheckAdminActive {
+class CheckAdminActive {
 
-    public DevicePolicyManager deviceManger;
-    public ComponentName compName;
+    private DevicePolicyManager deviceManger;
+    private ComponentName compName;
 
-    public CheckAdminActive(Context context){
+    CheckAdminActive(Context context){
         deviceManger = (DevicePolicyManager)context.getSystemService(
                 Context.DEVICE_POLICY_SERVICE);
         compName = new ComponentName(context, MyAdmin.class);
     }
 
-    public boolean isAdminActive(){
+    boolean isAdminActive(){
         return  deviceManger.isAdminActive(compName);
     }
 
-    public void lockTheScreen(){
+    void lockTheScreen(){
         deviceManger.lockNow();
     }
 
-    public Intent getIntentToEnableActiveAdmin(){
+    Intent getIntentToEnableActiveAdmin(){
         Intent intent = new Intent(DevicePolicyManager
                 .ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,
