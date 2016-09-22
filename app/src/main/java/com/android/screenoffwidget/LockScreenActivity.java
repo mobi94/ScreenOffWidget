@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
@@ -23,11 +24,13 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
@@ -149,6 +152,32 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.ic_help:
+                return true;
+            case R.id.ic_uninstall:
+                if (checkAdminActive.isAdminActive())
+                    checkAdminActive.disableActiveAdmin();
+                Intent intent = new Intent(Intent.ACTION_DELETE);
+                intent.setData(Uri.parse("package:com.android.screenoffwidget"));
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void setUpAdMob(){
         MobileAds.initialize(this, getResources().getString(R.string.banner_ad_unit_id));
         mAdView = (AdView) findViewById(R.id.adView);
@@ -229,7 +258,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
 
     private boolean isAccessibilitySettingsOn(Context mContext) {
         int accessibilityEnabled = 0;
-        final String service = getPackageName() + "/" + WindowsChangeDetectingService.class.getCanonicalName();
+        final String service = getPackageName() + "/" + WindowChangeDetectingService.class.getCanonicalName();
         try {
             accessibilityEnabled = Settings.Secure.getInt(
                     mContext.getApplicationContext().getContentResolver(),

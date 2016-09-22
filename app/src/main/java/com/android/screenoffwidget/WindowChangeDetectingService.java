@@ -10,7 +10,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
-public class WindowsChangeDetectingService extends AccessibilityService {
+public class WindowChangeDetectingService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {

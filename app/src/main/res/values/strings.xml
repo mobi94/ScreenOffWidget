@@ -35,6 +35,9 @@
     <string name="admin_permission_disabled">Admin permissions disabled</string>
     <string name="admin_permission_disable_request">You are going to disable admin rights for this application. Are you sure you want to continue?</string>
 
+    <string name="menu_main_help">Help</string>
+    <string name="menu_main_uninstall">Uninstall application</string>
+
     <string name="menu_apply">Apply</string>
     <string name="menu_check_all">Check all</string>
     <string name="menu_uncheck_all">Uncheck all</string>

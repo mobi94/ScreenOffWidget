@@ -71,9 +71,9 @@ public class FloatButtonService extends Service {
 
     public Runnable postDelayedHidingRunnable;
     public Handler handlerForHidingAnimation;
-    public ObjectAnimator leftToRightAnimator;
+    /*public ObjectAnimator leftToRightAnimator;
     public ObjectAnimator rightToLeftAnimator;
-    public ObjectAnimator alphaAnimator;
+    public ObjectAnimator alphaAnimator;*/
 
     private Spring spring;
     public static final double TENSION = 800;
@@ -91,7 +91,6 @@ public class FloatButtonService extends Service {
                     isLocked = false;
                     spring.setEndValue(0f);
                     if (shouldMove) shiftIconToScreenSide();
-                    shouldMove = false;
                     break;
                 case ACTION_ON_TOP_ACTIVITY_CHANGED:
                     shouldCurrentAppHideIcon = false;
@@ -105,7 +104,7 @@ public class FloatButtonService extends Service {
 
     //используется для возведения флагов shouldHide и shouldClick,
     //а также для вызова метода отсроченной отрисовки анимации hideIcon()
-    private Animator.AnimatorListener animatorListener = new Animator.AnimatorListener() {
+    /*private Animator.AnimatorListener animatorListener = new Animator.AnimatorListener() {
         @Override
         public void onAnimationStart(Animator animator) {}
         @Override
@@ -119,7 +118,7 @@ public class FloatButtonService extends Service {
         public void onAnimationCancel(Animator animator) {}
         @Override
         public void onAnimationRepeat(Animator animator) {}
-    };
+    };*/
 
     @Override
     public void onCreate() {
@@ -189,7 +188,7 @@ public class FloatButtonService extends Service {
                 PixelFormat.TRANSLUCENT);
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.windowAnimations = android.R.style.Animation_Translucent;
+        params.windowAnimations = android.R.style.Animation_Toast;
 
         initializationSavedCoordinates();
 
@@ -270,7 +269,15 @@ public class FloatButtonService extends Service {
         //отложенная анимация сворачивания за границу экрана
         postDelayedHidingRunnable = new Runnable() {
             public void run() {
-                if (params.x + iconWidth/2 <= screenWidth / 2)
+
+                lockScreenImageView.animate()
+                        .alpha(0.6f)
+                        .setDuration(iconHidingAnimationTime);
+                shouldHide = false;
+                shiftIconToScreenSide(1, -2*iconWidth/3 - delta/2,
+                        screenWidth - iconWidth/3 - delta/2);
+
+                /*if (params.x + iconWidth/2 <= screenWidth / 2)
                     lockScreenImageView.animate()
                             .alpha(0.6f)
                             .translationX(-2*iconWidth/3)
@@ -279,8 +286,7 @@ public class FloatButtonService extends Service {
                     lockScreenImageView.animate()
                             .alpha(0.6f)
                             .translationX(2*iconWidth/3)
-                            .setDuration(iconHidingAnimationTime);
-                shouldHide = false;
+                            .setDuration(iconHidingAnimationTime);*/
             }
         };
         //хэндлер для анимации сворачивания
@@ -326,23 +332,22 @@ public class FloatButtonService extends Service {
 
     public void pauseFloatingButton(){
         isLocked = true;
-        boolean hide = false;
         if (shouldHide) {
-            handlerForHidingAnimation.removeCallbacks(postDelayedHidingRunnable);
             shouldMove = false;
             shouldClick = false;
-            hide = true;
         }
-        shiftIconToScreenSide(hide, -iconWidth - delta,
+        shiftIconToScreenSide(3, -iconWidth - delta,
                 screenWidth + iconWidth + delta);
     }
 
     public void resumeFloatingButton(){
         isLocked = false;
-        boolean hide = true;
-        if (shouldHide) hide = false;
-        shiftIconToScreenSide(hide, - delta/2,
-                screenWidth - iconWidth - delta/2);
+        if (shouldHide) {
+            shiftIconToScreenSide(4, - delta/2,
+                    screenWidth - iconWidth - delta/2);
+        }
+        else shiftIconToScreenSide(4, -2*iconWidth/3 - delta/2,
+                screenWidth - iconWidth/3 - delta/2);
     }
 
     public void prepareSpringAnimation(){
@@ -386,13 +391,13 @@ public class FloatButtonService extends Service {
     }
 
     public void shiftIconToScreenSide(){
-        if (params.x + iconWidth/2 <= screenWidth / 2)  overlayAnimation(false, lockScreenImageView, params.x, -delta/2);
-        else  overlayAnimation(false, lockScreenImageView, params.x, screenWidth - iconWidth - delta/2);
+        if (params.x + iconWidth/2 <= screenWidth / 2)  overlayAnimation(0, lockScreenImageView, params.x, -delta/2);
+        else  overlayAnimation(0, lockScreenImageView, params.x, screenWidth - iconWidth - delta/2);
     }
 
-    public void shiftIconToScreenSide(boolean hide, int endX1, int endX2){
-        if (params.x + iconWidth/2 <= screenWidth / 2)  overlayAnimation(hide, lockScreenImageView, params.x, endX1);
-        else  overlayAnimation(hide, lockScreenImageView, params.x, endX2);
+    public void shiftIconToScreenSide(final int hideType, int endX1, int endX2){
+        if (params.x + iconWidth/2 <= screenWidth / 2)  overlayAnimation(hideType, lockScreenImageView, params.x, endX1);
+        else  overlayAnimation(hideType, lockScreenImageView, params.x, endX2);
     }
 
     public void updateViewLayout(View view, Integer x, Integer y, Integer w, Integer h){
@@ -408,27 +413,42 @@ public class FloatButtonService extends Service {
         }
     }
 
-    public void overlayAnimation(final boolean hide, final View view2animate, int viewX, final int endX) {
-        if (viewX != endX) {
-            ValueAnimator translateLeft = ValueAnimator.ofInt(viewX, endX);
-            translateLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    updateViewLayout(view2animate, val, null, null, null);
-                    if (val == endX) {
-                        if (endX >= -delta/2 || endX <= screenWidth - iconWidth - delta/2) params.x = endX;
-                        if (shouldHide && !hide){
+    public void overlayAnimation(final int hideType, final View view2animate, int viewX, final int endX) {
+        ValueAnimator translateLeft = ValueAnimator.ofInt(viewX, endX);
+        translateLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                updateViewLayout(view2animate, val, null, null, null);
+                if (val == endX) {
+                    //if (endX >= -delta/2 || endX <= screenWidth - iconWidth - delta/2)
+                    params.x = endX;
+                    handlerForHidingAnimation.removeCallbacks(postDelayedHidingRunnable);
+                    switch(hideType) {
+                        case 0:
+                            if (shouldMove) {
+                                spring.setEndValue(0f);
+                                shouldMove = false;
+                            }
                             saveCoordinatesToSharedPrefs();
                             hideIcon();
-                        }
-                        if (shouldHide && hide)spring.setEndValue(0f);
+                            break;
+                        case 2:
+                            shouldHide = true;
+                            shouldClick = true;
+                            isIconHidingAnimationActive = false;
+                            hideIcon();
+                            break;
+                        case 4:
+                            if (shouldMove) spring.setEndValue(0f);
+                            if (shouldHide) hideIcon();
+                            break;
                     }
                 }
-            });
-            translateLeft.setDuration(iconShiftingAnimationTime);
-            translateLeft.start();
-        }
+            }
+        });
+        translateLeft.setDuration(iconShiftingAnimationTime);
+        translateLeft.start();
         /*else {
             saveCoordinatesToSharedPrefs();
             hideIcon();
@@ -469,19 +489,20 @@ public class FloatButtonService extends Service {
         shouldClick = true;
         hideIcon();*/
 
-        if (params.x + iconWidth/2 <= screenWidth / 2) leftToRightAnimator.start();
+        /*if (params.x + iconWidth/2 <= screenWidth / 2) leftToRightAnimator.start();
         else rightToLeftAnimator.start();
-        alphaAnimator.start();
+        alphaAnimator.start();*/
+
+        lockScreenImageView.animate()
+                .alpha(1.0f)
+                .setDuration(iconHidingAnimationTime);
+        shiftIconToScreenSide(2, -delta/2,
+                screenWidth - iconWidth - delta/2);
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        if (!shouldHide)
-            lockScreenImageView.animate()
-                .alpha(1.0f)
-                .translationX(0)
-                .setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
-        else if (shouldMove) {
+        if (shouldMove) {
             spring.setEndValue(0f);
             shouldMove = false;
             shouldClick = false;
@@ -519,14 +540,14 @@ public class FloatButtonService extends Service {
         shiftIconToScreenSide();
 
         //инициализация объектов ObjectAnimator для отрисовки анимации появления иконки из-за экрана
-        leftToRightAnimator = ObjectAnimator.ofFloat(lockScreenImageView, "translationX", -2*iconWidth/3, 0)
+        /*leftToRightAnimator = ObjectAnimator.ofFloat(lockScreenImageView, "translationX", -2*iconWidth/3, 0)
                 .setDuration(iconHidingAnimationTime);
         rightToLeftAnimator = ObjectAnimator.ofFloat(lockScreenImageView, "translationX", 2*iconWidth/3, 0)
                 .setDuration(iconHidingAnimationTime);
         alphaAnimator = ObjectAnimator.ofFloat(lockScreenImageView,"alpha",1.0f)
                 .setDuration(iconHidingAnimationTime);
         leftToRightAnimator.addListener(animatorListener);
-        rightToLeftAnimator.addListener(animatorListener);
+        rightToLeftAnimator.addListener(animatorListener);*/
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -571,10 +592,7 @@ public class FloatButtonService extends Service {
         super.onDestroy();
         unregisterReceiver(mScreenStateReceiver);
         shouldDestroy = true;
-        if (lockScreenImageView != null) {
-            lockScreenImageView.setAlpha(0f);
-            windowManager.removeView(lockScreenImageView);
-        }
+        if (lockScreenImageView != null) windowManager.removeView(lockScreenImageView);
         if (transparentViewToCheckFullScreen != null) windowManager.removeView(transparentViewToCheckFullScreen);
     }
 

@@ -8,7 +8,7 @@
 
     <string name="progress_dialog">Пожалуйста, подождите…</string>
 
-    <string name="apps_list_title">Скрыть кнопку</string>
+    <string name="apps_list_title">Скрытие кнопки</string>
     <string name="apps_list_activity_subtitle_2nd_part_singular"> выбрано</string>
     <string name="apps_list_activity_subtitle_2nd_part_plural"> выбрано</string>
     <string name="apps_list_activity_subtitle_1st_part">Ничего не выбрано</string>
@@ -32,6 +32,9 @@
     <string name="admin_permission_enabled">Разрешение администратора включено</string>
     <string name="admin_permission_disabled">Разрешение администратора выключено</string>
     <string name="admin_permission_disable_request">Вы собираетесь отключить права администратора для этого приложения. Вы уверены, что хотите продолжить?</string>
+
+    <string name="menu_main_help">Помощь</string>
+    <string name="menu_main_uninstall">Удалить приложение</string>
 
     <string name="menu_apply">Применить</string>
     <string name="menu_check_all">Выбрать все</string>
