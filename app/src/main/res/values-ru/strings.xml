@@ -40,4 +40,17 @@
     <string name="menu_check_all">Выбрать все</string>
     <string name="menu_uncheck_all">Отменить все</string>
 
+    <string name="show_case_opening_title">ПРИВЕТСТВУЕМ!</string>
+    <string name="show_case_opening_content">Блокируйте экран одним касанием! Реализуйте это по своему вкусу:\n- создайте виджет!\n- активируёте плавающую кнопку!\n- включите уведомление, и это ещё не всё!</string>
+    <string name="show_case_opening_dismiss">ДАЛЕЕ</string>
+
+    <string name="show_case_first_content">Создайте плавающую кнопку! Для этого используются права администратора, поэтому перед удалением приложения удостовертесь, что разрешение отключено</string>
+    <string name="show_case_first_dismiss">ПОНЯТНО</string>
+
+    <string name="show_case_second_content">Для перемещения плавающей кнопки вам нужно удерживать палец на ней несколько секунд</string>
+    <string name="show_case_second_dismiss">ПОНЯТНО</string>
+
+    <string name="show_case_ending_content">Нажмите здесь, чтобы скрыть плавающую кнопку в нужных приложениях (кнопка должна быть активирована)</string>
+    <string name="show_case_ending_dismiss">ВПЕРЁД!</string>
+
 </resources>

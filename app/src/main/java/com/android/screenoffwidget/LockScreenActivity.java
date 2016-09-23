@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsoluteLayout;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -39,6 +41,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import uk.co.deanwild.materialshowcaseview.IShowcaseListener;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class LockScreenActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener  {
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -152,6 +159,81 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
 
     }
 
+    public void setShowCaseSequence(boolean isSingleUse){
+        final ImageView fab = new ImageView(this);
+        float scale = getResources().getDisplayMetrics().density;
+        int size = (int) ((50 * scale + 0.5f) * (0.7f + (float)defaultSeekBarProgress/100f));
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_float_button);
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, size, size, false);
+
+        final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(size, size);
+        fab.setImageBitmap(resizedBitmap);
+        fab.setX(0);
+        fab.setY(getApplicationContext().getResources().getDisplayMetrics().heightPixels/2);
+
+        MaterialShowcaseView opening = new MaterialShowcaseView.Builder(this)
+                .setTarget(((Toolbar) findViewById(R.id.my_toolbar)).getChildAt(2))
+                .setDismissTextColor(Color.rgb(255,82,82))
+                .setTitleText(R.string.show_case_opening_title)
+                .setContentText(R.string.show_case_opening_content)
+                .setDismissText(R.string.show_case_opening_dismiss)
+                .setDismissOnTargetTouch(true)
+                .setFadeDuration(500)
+                .withoutShape()
+                .build();
+
+        MaterialShowcaseView first = new MaterialShowcaseView.Builder(this)
+                .setTarget(switchFloatButton)
+                .setDismissTextColor(Color.rgb(255,82,82))
+                .setContentText(R.string.show_case_first_content)
+                .setDismissText(R.string.show_case_first_dismiss)
+                .setDismissOnTargetTouch(true)
+                .setFadeDuration(500)
+                .withRectangleShape(true)
+                .build();
+
+        MaterialShowcaseView second = new MaterialShowcaseView.Builder(this)
+                .setTarget(fab)
+                .setDismissTextColor(Color.rgb(255,82,82))
+                .setContentText(R.string.show_case_second_content)
+                .setDismissText(R.string.show_case_second_dismiss)
+                .setDismissOnTargetTouch(true)
+                .setFadeDuration(500)
+                .setListener(new IShowcaseListener() {
+                    @Override
+                    public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
+                        addContentView(fab, layoutParams);
+                    }
+                    @Override
+                    public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
+                        fab.setVisibility(View.GONE);
+                    }
+                })
+                .build();
+
+        MaterialShowcaseView ending = new MaterialShowcaseView.Builder(this)
+                .setTarget(buttonToHideInApps)
+                .setDismissTextColor(Color.rgb(255,82,82))
+                .setContentText(R.string.show_case_ending_content)
+                .setDismissText(R.string.show_case_ending_dismiss)
+                .withRectangleShape(true)
+                .setDismissOnTargetTouch(true)
+                .setFadeDuration(500)
+                .build();
+
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500);
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
+        if (isSingleUse) sequence.singleUse("singleUse");
+        sequence.setConfig(config);
+        sequence.addSequenceItem(opening);
+        sequence.addSequenceItem(first);
+        sequence.addSequenceItem(second);
+        sequence.addSequenceItem(ending);
+        sequence.start();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -166,6 +248,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 finish();
                 return true;
             case R.id.ic_help:
+                setShowCaseSequence(false);
                 return true;
             case R.id.ic_uninstall:
                 if (checkAdminActive.isAdminActive())
@@ -176,6 +259,12 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setShowCaseSequence(true);
     }
 
     public void setUpAdMob(){

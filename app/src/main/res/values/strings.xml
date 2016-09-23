@@ -42,4 +42,17 @@
     <string name="menu_check_all">Check all</string>
     <string name="menu_uncheck_all">Uncheck all</string>
 
+    <string name="show_case_opening_title">WELCOME!</string>
+    <string name="show_case_opening_content">Lock on and off the screen with one touch! You can do it in different ways:\n- create widget\n- enable floating button\n- turn on notification, and that\'s not all!</string>
+    <string name="show_case_opening_dismiss">NEXT</string>
+
+    <string name="show_case_first_content">Create floating button! It uses admin permissions, so make sure to disable permissions before uninstalling the app</string>
+    <string name="show_case_first_dismiss">GOT IT</string>
+
+    <string name="show_case_second_content">To move the floating button you need to hold your finger on it a few seconds</string>
+    <string name="show_case_second_dismiss">GOT IT</string>
+
+    <string name="show_case_ending_content">Click here if you need to hide the floating button in certain applications (button must be enabled)</string>
+    <string name="show_case_ending_dismiss">LETS GO!</string>
+
 </resources>
