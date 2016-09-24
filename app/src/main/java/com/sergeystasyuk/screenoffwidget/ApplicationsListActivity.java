@@ -1,4 +1,4 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -177,8 +177,6 @@ public class ApplicationsListActivity extends AppCompatActivity {
             }
         }
         getCheckedFromSharedPrefs();
-
-        updateCheckedCount();
     }
 
     public void updateCheckedCount(){
@@ -198,7 +196,7 @@ public class ApplicationsListActivity extends AppCompatActivity {
 
     public class ApplicationListAdapter extends RecyclerView.Adapter<ApplicationListAdapter.ViewHolder> {
 
-        public ApplicationListAdapter() {
+        ApplicationListAdapter() {
         }
 
         @Override
@@ -213,13 +211,14 @@ public class ApplicationsListActivity extends AppCompatActivity {
             return new ViewHolder(view);
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public ImageView appIcon;
-            public TextView appTitle;
-            public CheckBox appSelect;
+        class ViewHolder extends RecyclerView.ViewHolder {
+
+            ImageView appIcon;
+            TextView appTitle;
+            CheckBox appSelect;
             //public CardView cardView;
 
-            public ViewHolder(View v) {
+            ViewHolder(View v) {
                 super(v);
                 appIcon = (ImageView) v.findViewById(R.id.app_icon);
                 appTitle = (TextView) v.findViewById(R.id.app_title);
@@ -266,7 +265,7 @@ public class ApplicationsListActivity extends AppCompatActivity {
             }*/
         }
 
-        public Drawable getAppIconByPackageName(String packageName){
+        Drawable getAppIconByPackageName(String packageName){
             Drawable icon;
             try{
                 icon = packageManager.getApplicationIcon(packageName);
@@ -277,7 +276,7 @@ public class ApplicationsListActivity extends AppCompatActivity {
             return icon;
         }
 
-        public String getApplicationLabelByPackageName(String packageName){
+        String getApplicationLabelByPackageName(String packageName){
             ApplicationInfo applicationInfo;
             String label = getResources().getString(R.string.apps_list_activity_list_item_title_unknown);
             try {
@@ -309,6 +308,8 @@ public class ApplicationsListActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            updateCheckedCount();
+            adapter.notifyDataSetChanged();
             if (progressDialog.isShowing()) progressDialog.dismiss();
         }
     }

@@ -1,4 +1,4 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;

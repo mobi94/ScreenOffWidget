@@ -1,4 +1,4 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -43,7 +43,14 @@ public class MyWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        //checkAdminActive = new CheckAdminActive(context);
+        int[] allWidgetIds = AppWidgetManager
+                .getInstance(context)
+                .getAppWidgetIds(new ComponentName(context, MyWidgetProvider.class));
+        for (int widgetId : allWidgetIds) {
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+            remoteViews.setOnClickPendingIntent(R.id.update, getPendingSelfIntent(context, MyOnClick));
+            AppWidgetManager.getInstance(context).updateAppWidget(widgetId, remoteViews);
+        }
     }
 
     @Override

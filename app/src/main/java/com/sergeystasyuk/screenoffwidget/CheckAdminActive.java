@@ -1,10 +1,9 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 
 class CheckAdminActive {
 
@@ -35,7 +34,7 @@ class CheckAdminActive {
         return intent;
     }
 
-    public void disableActiveAdmin(){
+    void disableActiveAdmin(){
         deviceManger.removeActiveAdmin(compName);
     }
 }

@@ -1,4 +1,4 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

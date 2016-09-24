@@ -1,4 +1,4 @@
-package com.android.screenoffwidget;
+package com.sergeystasyuk.screenoffwidget;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -30,7 +30,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsoluteLayout;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -157,6 +156,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         switchNotification.setOnCheckedChangeListener(this);
         switchFullscreen.setOnCheckedChangeListener(this);
 
+        setShowCaseSequence(true);
     }
 
     public void setShowCaseSequence(boolean isSingleUse){
@@ -170,7 +170,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         final ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(size, size);
         fab.setImageBitmap(resizedBitmap);
         fab.setX(0);
-        fab.setY(getApplicationContext().getResources().getDisplayMetrics().heightPixels/2);
+        fab.setY(getResources().getDisplayMetrics().heightPixels/2);
 
         MaterialShowcaseView opening = new MaterialShowcaseView.Builder(this)
                 .setTarget(((Toolbar) findViewById(R.id.my_toolbar)).getChildAt(2))
@@ -178,9 +178,18 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 .setTitleText(R.string.show_case_opening_title)
                 .setContentText(R.string.show_case_opening_content)
                 .setDismissText(R.string.show_case_opening_dismiss)
+                .setDismissOnTouch(true)
                 .setDismissOnTargetTouch(true)
                 .setFadeDuration(500)
                 .withoutShape()
+                .setListener(new IShowcaseListener() {
+                    @Override
+                    public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
+                        scrollView.smoothScrollTo(0, switchFloatButton.getTop());
+                    }
+                    @Override
+                    public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {}
+                })
                 .build();
 
         MaterialShowcaseView first = new MaterialShowcaseView.Builder(this)
@@ -188,6 +197,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 .setDismissTextColor(Color.rgb(255,82,82))
                 .setContentText(R.string.show_case_first_content)
                 .setDismissText(R.string.show_case_first_dismiss)
+                .setDismissOnTouch(true)
                 .setDismissOnTargetTouch(true)
                 .setFadeDuration(500)
                 .withRectangleShape(true)
@@ -195,15 +205,18 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
 
         MaterialShowcaseView second = new MaterialShowcaseView.Builder(this)
                 .setTarget(fab)
+                .setShapePadding(50)
                 .setDismissTextColor(Color.rgb(255,82,82))
                 .setContentText(R.string.show_case_second_content)
                 .setDismissText(R.string.show_case_second_dismiss)
+                .setDismissOnTouch(true)
                 .setDismissOnTargetTouch(true)
                 .setFadeDuration(500)
                 .setListener(new IShowcaseListener() {
                     @Override
                     public void onShowcaseDisplayed(MaterialShowcaseView materialShowcaseView) {
                         addContentView(fab, layoutParams);
+                        switchFloatButton.getParent().requestChildFocus(switchFloatButton,switchFloatButton);
                     }
                     @Override
                     public void onShowcaseDismissed(MaterialShowcaseView materialShowcaseView) {
@@ -218,6 +231,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 .setContentText(R.string.show_case_ending_content)
                 .setDismissText(R.string.show_case_ending_dismiss)
                 .withRectangleShape(true)
+                .setDismissOnTouch(true)
                 .setDismissOnTargetTouch(true)
                 .setFadeDuration(500)
                 .build();
@@ -227,10 +241,10 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this);
         if (isSingleUse) sequence.singleUse("singleUse");
         sequence.setConfig(config);
-        sequence.addSequenceItem(opening);
-        sequence.addSequenceItem(first);
-        sequence.addSequenceItem(second);
-        sequence.addSequenceItem(ending);
+        sequence.addSequenceItem(opening)
+                .addSequenceItem(first)
+                .addSequenceItem(second)
+                .addSequenceItem(ending);
         sequence.start();
     }
 
@@ -244,9 +258,6 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
             case R.id.ic_help:
                 setShowCaseSequence(false);
                 return true;
@@ -254,26 +265,17 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
                 if (checkAdminActive.isAdminActive())
                     checkAdminActive.disableActiveAdmin();
                 Intent intent = new Intent(Intent.ACTION_DELETE);
-                intent.setData(Uri.parse("package:com.android.screenoffwidget"));
+                intent.setData(Uri.parse("package:com.sergeystasyuk.screenoffwidget"));
                 startActivity(intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setShowCaseSequence(true);
-    }
-
     public void setUpAdMob(){
         MobileAds.initialize(this, getResources().getString(R.string.banner_ad_unit_id));
         mAdView = (AdView) findViewById(R.id.adView);
-        adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("923FD3F5F3D07BA8F35509FFCC5AC800")
-                .build();
+        adRequest = new AdRequest.Builder().build();
     }
 
     public void getFirebaseAnalytics(){
