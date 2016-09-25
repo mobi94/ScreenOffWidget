@@ -520,7 +520,9 @@ public class FloatButtonService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        float size = (float)intent.getExtras().get("icon_size");
+        int progress = sharedpreferences.getInt(LockScreenActivity.SeekBarScale, 50);
+        float size = (int) ((50 * getResources().getDisplayMetrics().density + 0.5f) * (0.7f + (float)progress/100f));
+        if (intent != null) size = (float)intent.getExtras().get("icon_size");
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_float_button);
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, (int)size, (int)size, false);
         iconWidth = resizedBitmap.getWidth();
@@ -547,7 +549,7 @@ public class FloatButtonService extends Service {
         leftToRightAnimator.addListener(animatorListener);
         rightToLeftAnimator.addListener(animatorListener);*/
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     public void getCheckedFromSharedPrefs(String appToHide){

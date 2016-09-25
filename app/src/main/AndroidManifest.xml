@@ -58,6 +58,7 @@
 
         <service android:name="com.sergeystasyuk.screenoffwidget.FloatButtonService" />
         <service android:name="com.sergeystasyuk.screenoffwidget.NotificationService" />
+        <service android:name="com.sergeystasyuk.screenoffwidget.MyWidgetService" />
         <service
             android:label="@string/accessibility_service_name"
             android:name="com.sergeystasyuk.screenoffwidget.WindowChangeDetectingService"

@@ -1,5 +1,6 @@
 package com.sergeystasyuk.screenoffwidget;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -10,8 +11,7 @@ import android.widget.RemoteViews;
 
 public class MyWidgetProvider extends AppWidgetProvider {
 
-    private static final String MyOnClick = "myOnClickTag";
-    public CheckAdminActive checkAdminActive;
+    public static final String MyOnClick = "myOnClickTag";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
@@ -20,53 +20,56 @@ public class MyWidgetProvider extends AppWidgetProvider {
         ComponentName thisWidget = new ComponentName(context, MyWidgetProvider.class);
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
         for (int widgetId : allWidgetIds) {
-
-            //int number = (new Random().nextInt(100));
-
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
                     R.layout.widget_layout);
-
-            //remoteViews.setTextViewText(R.id.update, String.valueOf(number));
-
             remoteViews.setOnClickPendingIntent(R.id.update, getPendingSelfIntent(context, MyOnClick));
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
 
         }
     }
 
+    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected PendingIntent getPendingSelfIntent(Context context, String action) {
-        Intent intent = new Intent(context, getClass());
+        Intent intent = new Intent(context, MyWidgetService.class);
         intent.setAction(action);
-        return PendingIntent.getBroadcast(context, 0, intent, 0);
+        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        int[] allWidgetIds = AppWidgetManager
-                .getInstance(context)
-                .getAppWidgetIds(new ComponentName(context, MyWidgetProvider.class));
-        for (int widgetId : allWidgetIds) {
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-            remoteViews.setOnClickPendingIntent(R.id.update, getPendingSelfIntent(context, MyOnClick));
-            AppWidgetManager.getInstance(context).updateAppWidget(widgetId, remoteViews);
-        }
     }
 
     @Override
     public void onReceive(Context context, Intent intent){
-        super.onReceive(context, intent);
-        checkAdminActive = new CheckAdminActive(context);
-        switch (intent.getAction()){
-            case MyOnClick:
-            if (!checkAdminActive.isAdminActive())
-                context.startActivity(new Intent()
-                        .setComponent(new ComponentName("com.android.settings", "com.android.settings.DeviceAdminSettings"))
-                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            else
-                checkAdminActive.lockTheScreen();
-            break;
+        if(intent.getAction().equals(MyOnClick)) {
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                    R.layout.widget_layout);
+            // Create a fresh intent
+            Intent serviceIntent = new Intent(context, MyWidgetService.class);
+            if(isMyServiceRunning(MyWidgetService.class, context)) {
+                context.stopService(serviceIntent);
+                context.startService(serviceIntent);
+            } else {
+                context.startService(serviceIntent);
+            }
+            ComponentName componentName = new ComponentName(context, MyWidgetService.class);
+            AppWidgetManager.getInstance(context).updateAppWidget(componentName, remoteViews);
         }
+        else if (intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_DISABLED)){
+            Intent serviceIntent = new Intent(context, MyWidgetService.class);
+            if(isMyServiceRunning(MyWidgetService.class, context)) context.stopService(serviceIntent);
+        }
+        super.onReceive(context, intent);
     }
 
 }

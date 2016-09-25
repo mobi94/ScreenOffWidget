@@ -21,13 +21,16 @@ public class NotificationService extends Service {
             switch (intent.getAction()) {
             case ACTION_NOTIFICATION_CLICKED:
                 if (checkAdminActive.isAdminActive()) checkAdminActive.lockTheScreen();
-                else context.startActivity(new Intent()
-                            .setComponent(new ComponentName("com.android.settings", "com.android.settings.DeviceAdminSettings"))
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                else startActivity(checkAdminActive.getIntentToEnableActiveAdmin().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 break;
             }
         }
     };
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
 
     @Override
     public void onCreate() {

@@ -276,6 +276,7 @@ public class LockScreenActivity extends AppCompatActivity implements CompoundBut
         MobileAds.initialize(this, getResources().getString(R.string.banner_ad_unit_id));
         mAdView = (AdView) findViewById(R.id.adView);
         adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     public void getFirebaseAnalytics(){
